@@ -6,7 +6,7 @@ import 'package:diabetic/utils/constants.dart';
 
 class searchScreen extends StatefulWidget {
   
-  const searchScreen({Key? key}) : super(key: key);
+  const searchScreen({super.key});
 
   @override
   State<searchScreen> createState() => _searchScreenState();
