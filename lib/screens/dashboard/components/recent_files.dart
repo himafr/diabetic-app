@@ -1,14 +1,61 @@
 import 'package:diabetic/models/recent_file.dart';
+import 'package:diabetic/services/networking.dart';
 import 'package:diabetic/utils/constants.dart';
+import 'package:diabetic/utils/urls.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-class RecentFiles extends StatelessWidget {
+class RecentFiles extends StatefulWidget {
   const RecentFiles({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
+
+  @override
+  State<RecentFiles> createState() => _RecentFilesState();
+}
+
+class _RecentFilesState extends State<RecentFiles> {
+  bool isLoading = true;
+  dynamic _myMedicine;
+  List<dynamic> _review = [];
+  List<dynamic> _comments = [];
+  @override
+  void initState() {
+    super.initState();
+    loadBook();
+  }
+
+  void loadBook() async {
+//  setLoading(true);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    NetworkHelper networkHelper = NetworkHelper(
+        url: '$medsUrl/',
+        token: prefs.getString("token") ?? "");
+    // print(networkHelper.url);
+    try {
+      dynamic data = await networkHelper.getData();
+      print(data);
+      // .postData({"username": username, "password": password});
+      // print(data);
+      if (data["status"] == "success") {
+        setState(() {
+          _myMedicine = data["data"]["med"];
+          _comments = data["data"]["comments"];
+          _review = data["data"]["review"];
+          isLoading = false;
+        });
+        print(_myMedicine);
+      }
+    } catch (e) {
+      //   setError(e.toString());
+      // setLoading(false);
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,3 +123,9 @@ DataRow recentFileDataRow(RecentFile fileInfo) {
     ],
   );
 }
+// RecentFile(
+//     icon: "assets/icons/xd_file.svg",
+//     title: "XD File",
+//     date: "01-03-2021",
+//     size: "3.5mb",
+//   ),

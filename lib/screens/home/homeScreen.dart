@@ -1,21 +1,13 @@
-// ignore_for_file: file_names, camel_case_types, non_constant_identifier_names
+// ignore_for_file: file_names, camel_case_types, non_constant_identifier_names, prefer_interpolation_to_compose_strings
 
+
+import 'package:diabetic/components/pie_chart.dart';
+import 'package:diabetic/screens/dashboard/dashboard_screen.dart';
 import 'package:flutter/material.dart';
-// import 'package:marquee/marquee.dart';
-import 'package:diabetic/widgets/dashboardScreenWidgets/artistAndPodcastersColumn.dart';
-import 'package:diabetic/widgets/dashboardScreenWidgets/my_grid_container.dart';
-import 'package:diabetic/widgets/dashboardScreenWidgets/recentlyPlayed.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 class HomeScreen extends StatefulWidget {
-  final List<Map<String, dynamic>> recentPlayedItems;
-  final List<Map<String, dynamic>> recentPlaylistItems;
-  final List<Map<String, dynamic>> artistAndPodcastersItems;
+
   const HomeScreen(
-      {super.key,
-      required this.recentPlayedItems,
-      required this.recentPlaylistItems,
-      required this.artistAndPodcastersItems});
+      {super.key});
 
 
   @override
@@ -23,18 +15,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-//  getToWork();
-  }
-//   getToWork()async{
-//  SharedPreferences prefs = await SharedPreferences.getInstance();
-//   }
+  
   @override
   Widget build(BuildContext context) {
-    return Stack(
+      return Stack(
       children: [
         SingleChildScrollView(
           //physics: ScrollPhysics(),
@@ -51,12 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(left: 15),
-                        child: Text("Good morning",
+                        child: Text("Home Page",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 25,
-                               
-                                fontFamily: "SpotifyCircularBold")),
+                                color: Colors.white,
+                        )),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
@@ -64,119 +48,43 @@ class _HomeScreenState extends State<HomeScreen> {
                           IconButton(
                               onPressed: () {},
                               icon: const Icon(Icons.notifications_none_sharp,
-)),
+                                  color: Colors.white)),
                           IconButton(
                               onPressed: () {},
                               icon: const Icon(Icons.access_time_sharp,
-                                  )),
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.settings_outlined,
-                                  ))
+                                  color: Colors.white)),
+                          Builder(
+                            builder: (context) => IconButton(
+                                icon: const Icon(Icons.settings_outlined,
+                                    color: Colors.white),
+                                onPressed: () =>
+                                    Scaffold.of(context).openDrawer()),
+                          )
                         ]),
                       )
                     ],
                   ),
                 ),
-                GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 3.125),
+                // Expanded(child: 
+                // Row(
+                //   children: [
+                // LineChartSample()
 
-                  //physics: NeverScrollableScrollPhysics(),
-                  primary: false,
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  //controller: ScrollController(keepScrollOffset: false),
-                  shrinkWrap: true,
-                  itemCount: widget.recentPlaylistItems.length,
-                  itemBuilder: (BuildContext context, index) {
-                    return recentPlaylistContainer(
-                        name: widget.recentPlaylistItems[index]["name"],
-                        image: widget.recentPlaylistItems[index]["image"],
-                        artistAndPodcastersItems: widget.artistAndPodcastersItems);
-                  },
+                //   ],
+                // )
+                // )
+                const Row(
+                  children: [
+                    Expanded(
+                      // It takes 5/6 part of the screen
+                      flex: 5,
+                      child: DashboardScreen(),
+                    ),
+                  ],
                 ),
-                const Padding(
-                    padding: EdgeInsets.only(
-                        top: 30, left: 15, right: 15, bottom: 15),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text("Recently played",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 25,
-                              
-                              fontFamily: "SpotifyCircularBold"),
-                          textAlign: TextAlign.left),
-                    )),
-                Padding(
-                    padding: const EdgeInsets.only(left: 15, right: 15),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (int i = 0;
-                              i < widget.recentPlayedItems.length;
-                              i++)
-                            recentlyPlayed(
-                                name: widget.recentPlayedItems[i]['name'],
-                                image: widget.recentPlayedItems[i]['image'],
-                                border_radius: widget.recentPlayedItems[i]
-                                    ['border_radius'],
-                                artistAndPodcastersItems:
-                                    widget.artistAndPodcastersItems),
-                        ],
-                      ),
-                    )),
-                const Padding(
-                    padding: EdgeInsets.only(
-                        top: 15, left: 15, right: 15, bottom: 15),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        "Artists and Podcasters",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            
-                            fontFamily: "SpotifyCircularBold"),
-                        textAlign: TextAlign.left,
-                        maxLines: 2,
-                      ),
-                    )),
-                Padding(
-                    padding: const EdgeInsets.only(left: 15, right: 15),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (int i = 0;
-                              i < widget.artistAndPodcastersItems.length;
-                              i++)
-                            artistAndPodcastersColumn(
-                                name: widget.artistAndPodcastersItems[i]
-                                    ['name'],
-                                image: widget.artistAndPodcastersItems[i]
-                                    ['image'],
-                                border_radius:
-                                    widget.artistAndPodcastersItems[i]
-                                        ['border_radius'],
-                                artistAndPodcastersItems:
-                                    widget.artistAndPodcastersItems),
-                        ],
-                      ),
-                    )),
-                const Padding(
-                    padding: EdgeInsets.only(left: 15, right: 15),
-                    child: SizedBox(height: 140, width: double.infinity))
               ]),
         ),
+        // Positioned(
         //   bottom: 70,
         //   left: 10,
         //   child: Container(
@@ -204,12 +112,12 @@ class _HomeScreenState extends State<HomeScreen> {
         //               SizedBox(
         //                   width: MediaQuery.of(context).size.width - 46 - 194,
         //                   height: 20,
-        //                   child: Marquee(
+        //                   child: Marquee(0
         //                     text: "Agar Tum Saath Ho (From Tamasha)",
         //                     style: const TextStyle(
         //                         fontSize: 15,
         //                         fontFamily: "SpotifyCircularBold",
-        //                         ),
+        //                         color: Colors.white),
         //                     scrollAxis: Axis.horizontal,
         //                     crossAxisAlignment: CrossAxisAlignment.start,
         //                     blankSpace: 70,
@@ -221,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //                 style: TextStyle(
         //                     fontSize: 14,
         //                     fontFamily: "SpotifyCircularMedium",
-        //                     ),
+        //                     color: Colors.white),
         //                 textAlign: TextAlign.left,
         //               )
         //             ],
@@ -237,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //           IconButton(
         //               onPressed: () {},
         //               icon: const Icon(Icons.play_arrow_rounded,
-        //                   ))
+        //                   color: Colors.white))
         //         ],
         //       ),
         //     ),

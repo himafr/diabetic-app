@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'package:diabetic/components/pie_chart.dart';
 import 'package:diabetic/screens/dashboard/components/my_fields.dart';
 import 'package:diabetic/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'components/header.dart';
 

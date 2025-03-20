@@ -1,7 +1,7 @@
 // ignore_for_file: file_names, camel_case_types, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import '../../screens/artistsScreen.dart';
+import '../../artistsScreen.dart';
 
 class artistAndPodcastersColumn extends StatelessWidget{
   final String image;
@@ -40,7 +40,7 @@ class artistAndPodcastersColumn extends StatelessWidget{
                   style: const TextStyle(
                       fontSize: 15,
                       fontFamily: "SpotifyCircularBold",
-                     ),
+                      color: Colors.white),
                   textAlign: TextAlign.left,
                   softWrap: false,
                   maxLines: 2,

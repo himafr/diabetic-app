@@ -4,10 +4,16 @@ import 'package:requests/requests.dart';
 
 
 class NetworkHelper {
-  NetworkHelper({required this.url});
+  NetworkHelper({required this.url,this.token=""});
   final String url;
+  late String token="";
   Future getData() async {
-    var res = await Requests.get(url);
+    var res = await Requests.get(url,
+     headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ token,
+    }
+    );
     if (res.statusCode < 300) {
       return jsonDecode(res.body);
     } else {
@@ -15,10 +21,10 @@ class NetworkHelper {
     }
   }
   Future postData(bodyData)async{
-    print("here");
     var res = await Requests.post(url,
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+token,
     }
     ,body: bodyData,
     bodyEncoding: RequestBodyEncoding.JSON

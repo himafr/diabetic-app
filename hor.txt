@@ -1,0 +1,98 @@
+return Stack(
+  children: [
+    SingleChildScrollView(
+      primary: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 35),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 15),
+                  child: Text(
+                    "Books Page",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      fontFamily: "SpotifyCircularBold",
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications_none_sharp),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.access_time_sharp),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.settings_outlined),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.99,
+                maxHeight: MediaQuery.of(context).size.height * 0.5,
+              ),
+              color: Colors.blue,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            controller: _scrollController,
+                            itemCount: _data.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                width: 150,
+                                height: dynamicHeight,
+                                margin: EdgeInsets.all(10),
+                                color: Colors.green,
+                                child: Center(
+                                  child: Text(
+                                    'Item ${_data[index]}',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        if (_isLoading)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+);

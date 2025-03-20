@@ -50,8 +50,6 @@ class _SignupScreenState extends State<SignupScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     NetworkHelper networkHelper = NetworkHelper(url: signupUrl);
-    print(networkHelper.url);
-    print(password);
     try {
       dynamic data = await networkHelper.postData({
         "username": username,
@@ -59,7 +57,6 @@ class _SignupScreenState extends State<SignupScreen> {
         "first_name": firstName,
         "date_of_birth": selectedDate.toString()
       });
-      print(data);
       if (data["status"] == "success") {
         await prefs.setString("token", data["token"]);
         Navigator.pushReplacement(
@@ -73,7 +70,6 @@ class _SignupScreenState extends State<SignupScreen> {
     } catch (e) {
       setError(e.toString());
       setLoading(false);
-      print(e);
     }
   }
 
@@ -152,12 +148,6 @@ class _SignupScreenState extends State<SignupScreen> {
                       height: 40,
                     ),
                     TextFormField(
-                      // validator: (value) {
-                      //   return value!.contains(RegExp(
-                      //           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"))
-                      //       ? null
-                      //       : "Enter a valid email";
-                      // },
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       keyboardType: TextInputType.emailAddress,
                       obscureText: false,
@@ -230,7 +220,6 @@ class _SignupScreenState extends State<SignupScreen> {
                       obscureText: visible,
                       autofocus: false,
                       textInputAction: TextInputAction.done,
-                      // controller: passwordcontroller,
                       decoration: decorationTextfield.copyWith(
                         hintText: "Password",
                         suffixIcon: IconButton(

@@ -20,8 +20,10 @@ const kErrorColor = Color(0xFFF03738);
 const kBgColor = Color(0xFF212332);
 const primaryColor = Color(0xFF2697FF);
 const secondaryColor = Color(0xFF2A2D3E);
-const kHost="http://192.168.240.33:3000/api/v1/";
-// const kHost="https://diabeticapi.vercel.app/api/v1/";
+// const kHost="http://192.168.240.33:3000/api/v1/";
+// const kHost="http://192.168.240.33:3000/";
+const kHost="https://diabeticapi.vercel.app/api/v1/";
+const k_host="https://diabeticapi.vercel.app/";
 class Songs {
   static const Map<String, List<Map<String, String>>> songDetails = {
     'Arijit Singh': [
