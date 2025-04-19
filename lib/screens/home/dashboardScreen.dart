@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:diabetic/screens/books/books_screen.dart';
 import 'package:diabetic/screens/home/components/side_menu.dart';
-import 'package:diabetic/screens/home/main_screen.dart';
 import 'package:diabetic/screens/recipes/recipes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:diabetic/utils/constants.dart';
@@ -22,14 +21,14 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int myView = 1;
 
-  goToChartScreen() {
-    // await Future.delayed(const Duration(milliseconds: 3000), () {});
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MainScreen(),
-        ));
-  }
+  // goToChartScreen() {
+  //   // await Future.delayed(const Duration(milliseconds: 3000), () {});
+  //   Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => MainScreen(),
+  //       ));
+  // }
 
   int currentIndex = 2;
   bool bookColor = false;
