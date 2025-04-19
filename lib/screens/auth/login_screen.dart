@@ -12,65 +12,66 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.view});
-  final Function view;
+
+  final Function(String viewName) view;
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // Controllers (can be used if needed)
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String password = "";
-  String username = "";
-  bool visible = true;
-  @override
-  void initState() {
-    super.initState();
-  }
 
-  String err = "";
+  // User input values
+  String username = '';
+  String password = '';
+
+  // State variables
+  bool isPasswordVisible = true;
   bool isLoading = false;
-  void setLoading(bool value) {
-    setState(() {
-      isLoading = value;
-    });
-  }
+  String errorMsg = '';
 
-  void setError(String newErr) {
-    setState(() {
-      err = newErr;
-    });
-  }
+  // Toggle loading state
+  void setLoading(bool value) => setState(() => isLoading = value);
 
-  _login() async {
+  // Set error message
+  void setError(String message) => setState(() => errorMsg = message);
+
+  /// Performs login API call
+  Future<void> _login() async {
     setLoading(true);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
+    final networkHelper = NetworkHelper(url: logInUrl);
 
-    NetworkHelper networkHelper = NetworkHelper(url: logInUrl);
-    print(networkHelper.url);
     try {
-      dynamic data = await networkHelper
-          .postData({"username": username, "password": password});
-      print(data);
-      if (data["status"] == "success") {
-        if (data["data"]["userData"]["role"] == "patient") {
-          await prefs.setString("token", data["token"]);
+      final response = await networkHelper.postData({
+        "username": username,
+        "password": password,
+      });
+
+      if (response["status"] == "success") {
+        final role = response["data"]["userData"]["role"];
+        if (role == "patient") {
+          await prefs.setString("token", response["token"]);
+          if (!mounted) return;
           Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      const DashboardScreen(title: "DashboardScreen")));
+            context,
+            MaterialPageRoute(
+              builder: (_) => const DashboardScreen(title: "DashboardScreen"),
+            ),
+          );
         } else {
-          print("object");
-          setError(
-              "user type ${data["data"]["userData"]["role"]} cant be a patient");
+          setError("User type '$role' is not allowed to log in as a patient.");
         }
-        setLoading(false);
+      } else {
+        setError("Login failed. Please check your credentials.");
       }
     } catch (e) {
-      setError(e.toString());
+      setError("An error occurred: $e");
+    } finally {
       setLoading(false);
-      print(e);
     }
   }
 
@@ -78,190 +79,123 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Back button
         Positioned(
           top: 30,
           child: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              weight: 10,
-            ),
-            onPressed: () {
-              widget.view("welcome");
-            },
+            icon: const Icon(Icons.arrow_back_ios, weight: 10),
+            onPressed: () => widget.view("welcome"),
           ),
         ),
+
+        // Main form content
         Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // App logo
                   CircleAvatar(
                     backgroundColor: Theme.of(context).canvasColor,
-                    backgroundImage: AssetImage("assets/images/logo.png"),
+                    backgroundImage: const AssetImage("assets/images/logo.png"),
                     radius: 110,
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Text(
+                  const SizedBox(height: 15),
+
+                  // Welcome text
+                  const Text(
                     "Welcome to Diabetic",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(
-                    height: 50,
-                  ),
+                  const SizedBox(height: 50),
+
+                  // Username input field
                   TextField(
-                    // controller: emailController,
                     keyboardType: TextInputType.emailAddress,
-                    obscureText: false,
-                    autofocus: false,
                     textInputAction: TextInputAction.next,
                     decoration: decorationTextfield.copyWith(
-                        hintText: "Username", suffixIcon: Icon(Icons.email)),
-                    onChanged: (value) => {username = value},
+                      hintText: "Username",
+                      suffixIcon: const Icon(Icons.account_circle),
+                    ),
+                    onChanged: (val) => username = val,
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
+
+                  // Password input field
                   TextField(
-                    onChanged: (value) => password = value,
-                    // controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
-                    obscureText: visible,
-                    autofocus: false,
                     textInputAction: TextInputAction.done,
+                    obscureText: isPasswordVisible,
                     decoration: decorationTextfield.copyWith(
                       hintText: "Password",
                       suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              visible = !visible;
-                            });
-                          },
-                          icon: visible
-                              ? Icon(Icons.visibility_off)
-                              : Icon(Icons.visibility)),
+                        icon: Icon(isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () =>
+                            setState(() => isPasswordVisible = !isPasswordVisible),
+                      ),
                     ),
+                    onChanged: (val) => password = val,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    err,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
+
+                  // Error message (if any)
+                  if (errorMsg.isNotEmpty)
+                    Text(
+                      errorMsg,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  const SizedBox(height: 20),
+
+                  // Login button
                   ElevatedButton(
-                      onPressed: () async {
-                        _login();
-                      },
-                      style: ButtonStyle(
-                          padding: MaterialStateProperty.all(
-                              EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 10)),
-                          shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(18)))),
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor)),
-                      child: isLoading
-                          ? CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : Text(
-                              "Login",
-                              style: TextStyle(
-                                  fontSize: 27,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[200]),
-                            )),
-                  SizedBox(
-                    height: 20,
+                    onPressed: isLoading ? null : _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kPrimaryColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            "Login",
+                            style: TextStyle(
+                              fontSize: 27,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[200],
+                            ),
+                          ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 30),
+
+                  // Signup navigation
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "Don't have an account ?",
-                        style: TextStyle(
-                          fontSize: 19,
-                        ),
-                      ),
+                      const Text("Don't have an account?", style: TextStyle(fontSize: 19)),
                       TextButton(
-                          style: ButtonStyle(
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                          ),
-                          onPressed: () {
-                            widget.view("signup");
-                          },
-                          child: Text(
-                            "Sign up",
-                            style: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.blue,
-                            ),
-                          )),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 17,
-                  ),
-                  SizedBox(
-                    width: 299,
-                    child: Row(
-                      children: [
-                        Expanded(
-                            child: Divider(
-                          thickness: 0.6,
-                        )),
-                        Text(
-                          "OR",
-                          style: TextStyle(),
+                        onPressed: () => widget.view("signup"),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue,
+                          
+                          textStyle: TextStyle(decoration: TextDecoration.none)
                         ),
-                        Expanded(
-                            child: Divider(
-                          thickness: 0.6,
-                        )),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 27),
-                    child: GestureDetector(
-                      onTap: () {
-                        // googleSignInProvider.googlelogin();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(13),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                // color: Colors.purple,
-                                color: Color.fromARGB(255, 200, 67, 79),
-                                width: 2)),
-                        child: SvgPicture.asset(
-                          "assets/icons/google.svg",
-                          // ignore: deprecated_member_use
-                          color: Color.fromARGB(255, 200, 67, 79),
-                          height: 27,
+                        child: const Text(
+                          "Sign up",
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),

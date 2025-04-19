@@ -4,7 +4,6 @@ import 'package:diabetic/services/networking.dart';
 import 'package:diabetic/utils/constants.dart';
 import 'package:diabetic/utils/urls.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MedicineScreen extends StatefulWidget {
@@ -19,7 +18,6 @@ class _MedicineScreenState extends State<MedicineScreen> {
   bool isLoading = true;
   dynamic _myMedicine;
   List<dynamic> _review = [];
-  List<dynamic> _comments = [];
   @override
   void initState() {
     super.initState();
@@ -30,21 +28,18 @@ class _MedicineScreenState extends State<MedicineScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     NetworkHelper networkHelper = NetworkHelper(
-        url: '$medsUrl/${widget.medId}',
-        token: prefs.getString("token") ?? "");
+        url: '$medsUrl/${widget.medId}', token: prefs.getString("token") ?? "");
     try {
       dynamic data = await networkHelper.getData();
       if (data["status"] == "success") {
         setState(() {
           _myMedicine = data["data"]["med"];
-          _comments = data["data"]["comments"];
           _review = data["data"]["review"];
           isLoading = false;
         });
         print(_myMedicine);
       }
     } catch (e) {
-
       print(e);
     }
   }
@@ -56,7 +51,6 @@ class _MedicineScreenState extends State<MedicineScreen> {
             child: CircularProgressIndicator(),
           )
         : Scaffold(
-          
             appBar: AppBar(
               title: const Center(
                 child: Text(
@@ -82,14 +76,12 @@ class _MedicineScreenState extends State<MedicineScreen> {
                           ),
                         );
                       },
-                      child: Container(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Image.network(
-                            "${k_host}get/${_myMedicine?["med_photo"]}",
-                            width: double.infinity,
-                            fit: BoxFit.contain,
-                          ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Image.network(
+                          "${k_host}get/${_myMedicine?["med_photo"]}",
+                          width: double.infinity,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
@@ -116,12 +108,11 @@ class _MedicineScreenState extends State<MedicineScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // قسم التقييم والمراجعات
                     Padding(
                       padding: EdgeInsets.all(20.0),
                       child: ReviewsSection(
-                        comments: _comments,
                         review: _review,
                       ),
                     ),
@@ -169,22 +160,17 @@ class CartPage extends StatelessWidget {
   }
 }
 
-
 class ReviewsSection extends StatelessWidget {
-  const ReviewsSection(
-      {super.key, required this.comments, required this.review});
+  const ReviewsSection({super.key, required this.review});
   final List<dynamic> review;
-  final List<dynamic> comments;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          itemCount: comments.length,
-          shrinkWrap: true, // Use this to prevent overflow
-          itemBuilder: (context, index) {
-            return ListTile(
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      ListView.builder(
+        itemCount: review.length,
+        shrinkWrap: true, // Use this to prevent overflow
+        itemBuilder: (context, index) {
+          return ListTile(
               onTap: () {
                 Navigator.push(
                   context,
@@ -193,53 +179,52 @@ class ReviewsSection extends StatelessWidget {
                   ),
                 );
               },
-                  title: Column(
-                    children: [
-                      Divider(color: Colors.grey, thickness: 1, height: 30),
-                      ReviewItem(
-                        avatarPath: "${k_host}get/${ comments[index]["photo"]}",
-                        reviewerName: comments[index]["first_name"]+" " + comments[index]["last_name"],
-                        reviewText:"علاج جميل "
-                            // comments[index]["comment_content"],
+              title: Column(
+                children: [
+                  Divider(color: Colors.grey, thickness: 1, height: 30),
+                  ReviewItem(
+                      avatarPath: "${k_host}get/${review[index]["photo"]}",
+                      reviewerName: review[index]["first_name"] +
+                          " " +
+                          review[index]["last_name"],
+                      reviewText:  "علاج جميل "
+                      // review[index]["review_content"],
                       ),
-                    ],
-                  ));
-            },
-          
-        
-    ),
-    ]
-    );
+                ],
+              ));
+        },
+      ),
+    ]);
   }
 }
-        
-        // Divider(color: Colors.grey, thickness: 1, height: 30),
-        // ReviewItem(
-        //   avatarPath: 'assets/images/land.jpeg',
-        //   reviewerName: 'Hema Salem',
-        //   reviewText:
-        //       'A simple Sweater but makes the user seem neat and beautiful.',
-        //   thumbsUp: 11,
-        //   thumbsDown: 0,
-        // ),
-        // Divider(color: Colors.grey, thickness: 1, height: 30),
-        // ReviewItem(
-        //   avatarPath: 'assets/images/land.jpeg',
-        //   reviewerName: 'Ahmed Ibrahim',
-        //   reviewText:
-        //       'A simple Sweater but makes the user seem neat and beautiful.',
-        //   thumbsUp: 9,
-        //   thumbsDown: 0,
-        // ),
-        // Divider(color: Colors.grey, thickness: 1, height: 30),
-        // ReviewItem(
-        //   avatarPath: 'assets/images/land.jpeg',
-        //   reviewerName: 'Mabrouk Mohamed',
-        //   reviewText:
-        //       'A simple Sweater but makes the user seem neat and beautiful.',
-        //   thumbsUp: 13,
-        //   thumbsDown: 0,
-        // ),
+
+// Divider(color: Colors.grey, thickness: 1, height: 30),
+// ReviewItem(
+//   avatarPath: 'assets/images/land.jpeg',
+//   reviewerName: 'Hema Salem',
+//   reviewText:
+//       'A simple Sweater but makes the user seem neat and beautiful.',
+//   thumbsUp: 11,
+//   thumbsDown: 0,
+// ),
+// Divider(color: Colors.grey, thickness: 1, height: 30),
+// ReviewItem(
+//   avatarPath: 'assets/images/land.jpeg',
+//   reviewerName: 'Ahmed Ibrahim',
+//   reviewText:
+//       'A simple Sweater but makes the user seem neat and beautiful.',
+//   thumbsUp: 9,
+//   thumbsDown: 0,
+// ),
+// Divider(color: Colors.grey, thickness: 1, height: 30),
+// ReviewItem(
+//   avatarPath: 'assets/images/land.jpeg',
+//   reviewerName: 'Mabrouk Mohamed',
+//   reviewText:
+//       'A simple Sweater but makes the user seem neat and beautiful.',
+//   thumbsUp: 13,
+//   thumbsDown: 0,
+// ),
 
 // Widget لكل مراجعة
 class ReviewItem extends StatelessWidget {
@@ -247,13 +232,11 @@ class ReviewItem extends StatelessWidget {
   final String reviewerName;
   final String reviewText;
 
-
   const ReviewItem({
     Key? key,
     required this.avatarPath,
     required this.reviewerName,
     required this.reviewText,
-  
   }) : super(key: key);
 
   @override
@@ -269,9 +252,10 @@ class ReviewItem extends StatelessWidget {
               },
               child: CircleAvatar(
                 radius: 40,
-                backgroundImage: Image.network(avatarPath,errorBuilder: (context, error, stackTrace) {
-    return Text('Failed to load image');
-  },) as ImageProvider,
+                backgroundImage: NetworkImage(avatarPath),
+                onBackgroundImageError: (error, stackTrace) {
+                  print('Failed to load image: $error');
+                },
               ),
             ),
             const SizedBox(width: 16),
@@ -318,7 +302,6 @@ class ReviewItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 20),
-           
           ],
         ),
       ],

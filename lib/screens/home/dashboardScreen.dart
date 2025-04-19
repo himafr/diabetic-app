@@ -2,18 +2,14 @@
 // ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously
 
 import 'dart:async';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:diabetic/screens/books/booksScreen.dart';
-import 'package:diabetic/screens/main/components/side_menu.dart';
-import 'package:diabetic/screens/main/main_screen.dart';
-import 'package:diabetic/screens/recipes/recipesScreen.dart';
-import 'package:diabetic/widgets/state/loading_state/loading_chat_screen.dart';
+import 'package:diabetic/screens/books/books_screen.dart';
+import 'package:diabetic/screens/home/components/side_menu.dart';
+import 'package:diabetic/screens/home/main_screen.dart';
+import 'package:diabetic/screens/recipes/recipes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:diabetic/utils/constants.dart';
 import 'package:diabetic/screens/meds/meds_screen.dart';
-import 'package:diabetic/screens/home/homeScreen.dart';
-import 'package:heroicons/heroicons.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.title});
@@ -25,22 +21,18 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int myView = 1;
-  
+
   goToChartScreen() {
     // await Future.delayed(const Duration(milliseconds: 3000), () {});
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>  MainScreen(),
+          builder: (context) => MainScreen(),
         ));
   }
 
   int currentIndex = 2;
   bool bookColor = false;
-  // Color recipeColor = Colors.white54;
-  // Color homeColor = Colors.white;
-  // Color medColor = Colors.white54;
-  // Color chatColor = Colors.white54;
   double bookSize = 24;
   double bookTextSize = 13;
   double recipeSize = 24;
@@ -102,17 +94,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           toolbarHeight: 0,
           backgroundColor: kSecondaryColor,
         ),
-      drawer:const SideMenu(),
-
-        body:  (myView == 0
-                ? const BooksScreen()
-                : myView == 1
-                    ? const RecipesScreen()
-                    : myView == 2
-                        ? const MedsScreen()
-                        :    const LoadingChatsScreen()
-                            )
-          ,
+        drawer: const SideMenu(),
+        body: (myView == 0
+            ? const BooksScreen()
+            : myView == 1
+                ? const RecipesScreen()
+                : const MedsScreen()),
         extendBody: true,
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
@@ -142,13 +129,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         myView = currentIndex;
                         // goToChartScreen();
                       }
-                    
+
                       if (currentIndex == 2) {
                         setDefault();
                         medSize = 27;
                         myView = currentIndex;
                       }
-                     
                     }),
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Theme.of(context).canvasColor.withOpacity(0.5),
@@ -171,7 +157,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   BottomNavigationBarItem(
                       icon: Icon(Icons.food_bank, size: recipeSize),
                       label: "Recipes"),
-                  
                   BottomNavigationBarItem(
                       icon: Icon(Icons.medication_liquid_sharp, size: medSize),
                       label: "Medication"),
@@ -188,14 +173,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         builder: (BuildContext context) => AlertDialog(
               title: const Text(
                 "No internet connection",
-                style: TextStyle(
-                   color: Colors.white),
+                style: TextStyle(color: Colors.white),
               ),
               content: const Text(
                 "Turn on mobile data or connect to Wi-Fi.",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               shape: RoundedRectangleBorder(
@@ -213,9 +196,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         backgroundColor: kPrimaryColor,
                         foregroundColor: Colors.white,
                         elevation: 10,
-                        textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18),
+                        textStyle:
+                            const TextStyle(color: Colors.white, fontSize: 18),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25)),
                         fixedSize: const Size(250, 50)),

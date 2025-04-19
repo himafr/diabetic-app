@@ -9,8 +9,6 @@ import 'package:diabetic/utils/constants.dart';
 import 'package:diabetic/utils/urls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
-// import 'dart:html' as html;
-// import 'package:marquee/marquee.dart';
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -23,7 +21,7 @@ class _BooksScreenState extends State<BooksScreen> {
   List<dynamic> _data = [];
   int _last = 6;
   int _now = 0;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
   @override
@@ -112,12 +110,6 @@ class _BooksScreenState extends State<BooksScreen> {
     });
   }
 
-// void downloadFile(String url) {
-//   final anchor = html.AnchorElement(href: url)
-//     ..setAttribute('download', 'file_name')
-//     ..click();
-// }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -175,7 +167,7 @@ class _BooksScreenState extends State<BooksScreen> {
                   ],
                 ),
               ),
-              //لحد هنا 
+              //لحد هنا
               Center(
                 child: Container(
                   constraints: BoxConstraints(
@@ -234,73 +226,6 @@ class _BooksScreenState extends State<BooksScreen> {
             ],
           ),
         ),
-        // Positioned(
-        //   bottom: 70,
-        //   left: 10,
-        //   child: Container(
-        //     decoration: BoxDecoration(
-        //         color: Colors.indigo.shade900,
-        //         borderRadius: BorderRadius.circular(10)),
-        //     width: MediaQuery.of(context).size.width - 20,
-        //     height: 60,
-        //     child: Padding(
-        //       padding: const EdgeInsets.all(8),
-        //       child: Row(
-        //         mainAxisAlignment: MainAxisAlignment.center,
-        //         crossAxisAlignment: CrossAxisAlignment.center,
-        //         children: [
-        //           ClipRRect(
-        //             borderRadius: BorderRadius.circular(5),
-        //             child: Image.asset("assets/songs/arijitSingh/images/tamasha.jpg"),
-        //           ),
-        //           const SizedBox(width: 10),
-        //           Column(
-        //             mainAxisAlignment: MainAxisAlignment.center,
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             mainAxisSize: MainAxisSize.max,
-        //             children: [
-        //               SizedBox(
-        //                   width: MediaQuery.of(context).size.width - 46 - 194,
-        //                   height: 20,
-        //                   child: Marquee(
-        //                     text: "Agar Tum Saath Ho (From Tamasha)",
-        //                     style: const TextStyle(
-        //                         fontSize: 15,
-        //                         fontFamily: "SpotifyCircularBold",
-        //                         ),
-        //                     scrollAxis: Axis.horizontal,
-        //                     crossAxisAlignment: CrossAxisAlignment.start,
-        //                     blankSpace: 70,
-        //                     velocity: 20.0,
-        //                     startPadding: 5.0,
-        //                   )),
-        //               const Text(
-        //                 "Arijit Singh",
-        //                 style: TextStyle(
-        //                     fontSize: 14,
-        //                     fontFamily: "SpotifyCircularMedium",
-        //                     ),
-        //                 textAlign: TextAlign.left,
-        //               )
-        //             ],
-        //           ),
-        //           IconButton(
-        //               onPressed: () {},
-        //               icon:
-        //                   const Icon(Icons.devices_sharp, color: Colors.grey)),
-        //           IconButton(
-        //               onPressed: () {},
-        //               icon: Icon(Icons.favorite_outlined,
-        //                   color: Colors.greenAccent[400])),
-        //           IconButton(
-        //               onPressed: () {},
-        //               icon: const Icon(Icons.play_arrow_rounded,
-        //                   ))
-        //         ],
-        //       ),
-        //     ),
-        //   ),
-        // )
       ],
     );
   }

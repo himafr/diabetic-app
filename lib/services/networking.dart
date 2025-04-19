@@ -11,7 +11,7 @@ class NetworkHelper {
     var res = await Requests.get(url,
      headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ token,
+      'Authorization': 'Bearer $token',
     }
     );
     if (res.statusCode < 300) {
@@ -24,7 +24,7 @@ class NetworkHelper {
     var res = await Requests.post(url,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+token,
+      'Authorization': 'Bearer $token',
     }
     ,body: bodyData,
     bodyEncoding: RequestBodyEncoding.JSON

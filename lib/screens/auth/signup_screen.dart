@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key, required this.view});
-  final Function view;
+  final Function(String viewName) view;
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -23,88 +23,103 @@ class _SignupScreenState extends State<SignupScreen> {
   bool hasUppercase = false;
   bool hasDigits = false;
   bool hasLowercase = false;
-  bool hasSpecialCharacters = false;
-  bool hasMin8Characters = false;
-  bool visible = true;
-  String username = "";
-  String password = "";
-  String firstName = "";
+  bool hasSpecialChars = false;
+  bool hasMinLength = false;
+  bool isPasswordVisible = true;
+
+  String username = '';
+  String password = '';
+  String firstName = '';
   DateTime? selectedDate;
 
-  String err = "";
+  String errorMsg = '';
   bool isLoading = false;
+
   void setLoading(bool value) {
+    setState(() => isLoading = value);
+  }
+
+  void setError(String message) {
+    setState(() => errorMsg = message);
+  }
+
+  void updatePasswordStrength(String pwd) {
+    password = pwd;
     setState(() {
-      isLoading = value;
+      hasUppercase = RegExp(r'[A-Z]').hasMatch(pwd);
+      hasDigits = RegExp(r'[0-9]').hasMatch(pwd);
+      hasLowercase = RegExp(r'[a-z]').hasMatch(pwd);
+      hasSpecialChars = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(pwd);
+      hasMinLength = pwd.length >= 8;
     });
   }
 
-  void setError(String newErr) {
-    setState(() {
-      err = newErr;
-    });
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() => selectedDate = pickedDate);
+    }
   }
 
-  signup() async {
+  Future<void> _register() async {
     setLoading(true);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    NetworkHelper networkHelper = NetworkHelper(url: signupUrl);
     try {
-      dynamic data = await networkHelper.postData({
-        "username": username,
-        "password": password,
-        "first_name": firstName,
-        "date_of_birth": selectedDate.toString()
-      });
-      if (data["status"] == "success") {
-        await prefs.setString("token", data["token"]);
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const DashboardScreen(title: "DashboardScreen")));
+      final prefs = await SharedPreferences.getInstance();
+      final networkHelper = NetworkHelper(url: signupUrl);
 
-        setLoading(false);
+      final response = await networkHelper.postData({
+        'username': username,
+        'password': password,
+        'first_name': firstName,
+        'date_of_birth': selectedDate.toString(),
+      });
+
+      if (response['status'] == 'success') {
+        await prefs.setString('token', response['token']);
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const DashboardScreen(title: 'DashboardScreen'),
+          ),
+        );
+      } else {
+        setError(response['message'] ?? 'Registration failed.');
       }
     } catch (e) {
-      setError(e.toString());
+      setError('An error occurred: $e');
+    } finally {
       setLoading(false);
     }
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+  Widget _buildPasswordCriteria(String label, bool condition) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 13),
+      child: Row(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(right: 15),
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: condition ? Colors.green : Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(width: 0.7),
+            ),
+            child: const Icon(Icons.check, size: 15, color: Colors.white),
+          ),
+          Text(label),
+        ],
+      ),
     );
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
-  }
-
-  onChangePassword(String password) {
-    this.password = password;
-    setState(() {
-      password.contains(RegExp(r'[A-Z]'))
-          ? hasUppercase = true
-          : hasUppercase = false;
-      password.contains(RegExp(r'[0-9]'))
-          ? hasDigits = true
-          : hasDigits = false;
-      password.contains(RegExp(r'[a-z]'))
-          ? hasLowercase = true
-          : hasLowercase = false;
-      password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
-          ? hasSpecialCharacters = true
-          : hasSpecialCharacters = false;
-      password.contains(RegExp(r'.{8,}'))
-          ? hasMin8Characters = true
-          : hasMin8Characters = false;
-    });
   }
 
   @override
@@ -114,13 +129,8 @@ class _SignupScreenState extends State<SignupScreen> {
         Positioned(
           top: 30,
           child: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              weight: 10,
-            ),
-            onPressed: () {
-              widget.view("welcome");
-            },
+            icon: const Icon(Icons.arrow_back_ios, weight: 10),
+            onPressed: () => widget.view('welcome'),
           ),
         ),
         Center(
@@ -128,7 +138,6 @@ class _SignupScreenState extends State<SignupScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: SingleChildScrollView(
               child: Form(
-                // key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -137,298 +146,118 @@ class _SignupScreenState extends State<SignupScreen> {
                       backgroundImage: AssetImage("assets/images/logo.png"),
                       radius: 110,
                     ),
+                    const SizedBox(height: 20),
                     const Text(
-                      "Green: Where Nature Thrives.",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      "Welcome to Diabetic",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(
-                      height: 40,
-                    ),
+                    const SizedBox(height: 40),
                     TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      keyboardType: TextInputType.emailAddress,
-                      obscureText: false,
-                      autofocus: false,
+                      keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
-                      onChanged: (value) => firstName = value,
+                      onChanged: (val) => firstName = val,
                       decoration: decorationTextfield.copyWith(
                         hintText: "First name",
                         suffixIcon: const Icon(Icons.person),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.name,
-                      obscureText: false,
-                      autofocus: true,
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      onChanged: (value) => username = value,
+                      onChanged: (val) => username = val,
                       decoration: decorationTextfield.copyWith(
                         hintText: "Username",
-                        suffixIcon: const Icon(Icons.person),
+                        suffixIcon: const Icon(Icons.account_circle),
                       ),
                     ),
-                    const SizedBox(
-                      height: 30,
+                    const SizedBox(height: 30),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white70),
+                          onPressed: () => _selectDate(context),
+                          child: const Text("Select Date"),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(DateFormat.yMMMEd().format(selectedDate ?? DateTime.now())),
+                      ],
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: Row(
-                        children: [
-                          ElevatedButton(
-                            style: const ButtonStyle().copyWith(
-                                backgroundColor: const MaterialStatePropertyAll(
-                                    Colors.white70)),
-                            onPressed: () => _selectDate(context),
-                            child: const Text('Select date'),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(DateFormat.yMMMEd()
-                              .format(selectedDate != null
-                                  ? selectedDate!
-                                  : DateTime.now())
-                              .toString())
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     TextFormField(
-                      onChanged: (password) {
-                        onChangePassword(password);
-                      },
-                      validator: (password) {
-                        return password!.contains(RegExp(r'[A-Z]')) &&
-                                password.contains(RegExp(r'[0-9]')) &&
-                                password.contains(RegExp(r'[a-z]')) &&
-                                password.contains(
-                                    RegExp(r'[!@#$%^&*(),.?":{}|<>]')) &&
-                                password.contains(RegExp(r'.{8,}'))
-                            ? null
-                            : "Your password is weak";
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      obscureText: isPasswordVisible,
                       keyboardType: TextInputType.visiblePassword,
-                      obscureText: visible,
-                      autofocus: false,
                       textInputAction: TextInputAction.done,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onChanged: updatePasswordStrength,
+                      validator: (pwd) {
+                        if (pwd == null ||
+                            !hasUppercase ||
+                            !hasLowercase ||
+                            !hasDigits ||
+                            !hasSpecialChars ||
+                            !hasMinLength) {
+                          return "Your password is weak";
+                        }
+                        return null;
+                      },
                       decoration: decorationTextfield.copyWith(
                         hintText: "Password",
                         suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                visible = !visible;
-                              });
-                            },
-                            icon: visible
-                                ? const Icon(Icons.visibility_off)
-                                : const Icon(Icons.visibility)),
+                          icon: Icon(isPasswordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            setState(() => isPasswordVisible = !isPasswordVisible);
+                          },
+                        ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
+                    const SizedBox(height: 15),
                     Column(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 15),
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                  color: hasUppercase
-                                      ? Colors.green
-                                      : Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(width: 0.7)),
-                              child: const Icon(
-                                Icons.check,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text("Has Uppercase")
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 13,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 15),
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                  color: hasLowercase
-                                      ? Colors.green
-                                      : Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(width: 0.7)),
-                              child: const Icon(
-                                Icons.check,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text("Has Lowercase")
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 13,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 15),
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                  color:
-                                      hasDigits ? Colors.green : Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(width: 0.7)),
-                              child: const Icon(
-                                Icons.check,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text("Has Digits ")
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 13,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 15),
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                  color: hasSpecialCharacters
-                                      ? Colors.green
-                                      : Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(width: 0.7)),
-                              child: const Icon(
-                                Icons.check,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text("Has Special Characters")
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 13,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 15),
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                  color: hasMin8Characters
-                                      ? Colors.green
-                                      : Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(width: 0.7)),
-                              child: const Icon(
-                                Icons.check,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text("Has (min. 8) Characters")
-                          ],
-                        ),
+                        _buildPasswordCriteria("Has Uppercase", hasUppercase),
+                        _buildPasswordCriteria("Has Lowercase", hasLowercase),
+                        _buildPasswordCriteria("Has Digits", hasDigits),
+                        _buildPasswordCriteria("Has Special Characters", hasSpecialChars),
+                        _buildPasswordCriteria("Has (min. 8) Characters", hasMinLength),
                       ],
                     ),
-                    const SizedBox(
-                      height: 40,
-                    ),
+                    const SizedBox(height: 40),
                     ElevatedButton(
-                        style: const ButtonStyle(
-                            padding: MaterialStatePropertyAll(
-                                EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 10)),
-                            shape: MaterialStatePropertyAll(
-                                RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20)))),
-                            backgroundColor:
-                                MaterialStatePropertyAll(kPrimaryColor)),
-                        onPressed: () async {
-                          signup();
-                          // if (_formKey.currentState!.validate()) {
-                          //   await register();
-                          //   if (!mounted) return;
-                          //   Navigator.pushReplacement(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => const Login()),
-                          //   );
-                          //   showSnackBar(context, "Done");
-                          // } else {
-                          //   showSnackBar(context,
-                          //       "Something is wrong Please check your password or email");
-                          // }
-                        },
-                        child:
-                            // isloading
-                            //     ? const CircularProgressIndicator(
-                            //         color: Colors.white,
-                            //       )
-                            //     :
-                            Text(
-                          "Register",
-                          style: TextStyle(
-                              fontSize: 27,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        )),
-                    const SizedBox(
-                      height: 30,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kPrimaryColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: isLoading ? null : _register,
+                      child: const Text(
+                        "Register",
+                        style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
                     ),
+                    const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Have an account ?",
-                          style: TextStyle(
-                            fontSize: 19,
+                        const Text("Have an account?", style: TextStyle(fontSize: 19)),
+                        TextButton(
+                          onPressed: () => widget.view("login"),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.blue,
+                          ),
+                          child: const Text(
+                            "Sign in",
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
-                        TextButton(
-                            style: const ButtonStyle(
-                              overlayColor:
-                                  MaterialStatePropertyAll(Colors.transparent),
-                            ),
-                            onPressed: () {
-                              widget.view("login");
-                            },
-                            child: const Text(
-                              "Sign in",
-                              style: TextStyle(
-                                fontSize: 19,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.blue,
-                              ),
-                            ))
                       ],
                     )
                   ],

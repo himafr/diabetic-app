@@ -1,7 +1,6 @@
 import 'package:diabetic/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-
 class BookListCard extends StatelessWidget {
   const BookListCard({
     super.key,
@@ -13,12 +12,12 @@ class BookListCard extends StatelessWidget {
 
   final String title, svgSrc;
   final String numOfFiles;
-final Widget amountOfFiles;
+  final Widget amountOfFiles;
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: kDefaultPadding),
-      padding: EdgeInsets.all(kDefaultPadding),
+      margin: const EdgeInsets.only(top: kDefaultPadding),
+      padding: const EdgeInsets.all(kDefaultPadding),
       decoration: BoxDecoration(
         border: Border.all(width: 2, color: primaryColor.withOpacity(0.15)),
         borderRadius: const BorderRadius.all(
@@ -28,7 +27,10 @@ final Widget amountOfFiles;
       child: Row(
         children: [
           SizedBox(
-            child: Image.network(svgSrc,height: 40,),
+            child: Image.network(
+              svgSrc,
+              height: 40,
+            ),
           ),
           Expanded(
             child: Padding(

@@ -3,9 +3,8 @@
 import 'package:diabetic/services/networking.dart';
 import 'package:diabetic/utils/constants.dart';
 import 'package:diabetic/utils/urls.dart';
-import 'package:diabetic/screens/recipes/recentlyPlayed.dart';
+import 'package:diabetic/screens/recipes/normal_food_card.dart';
 import 'package:flutter/material.dart';
-// import 'package:marquee/marquee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecipesScreen extends StatefulWidget {
@@ -16,14 +15,9 @@ class RecipesScreen extends StatefulWidget {
 }
 
 class _RecipesScreenState extends State<RecipesScreen> {
-  List<dynamic> _data = [];
   List<dynamic> _healthyFood = [];
   List<dynamic> _normalFood = [];
   List<dynamic> _drinks = [];
-  int _last = 6;
-  int _now = 0;
-  ScrollController _scrollController = ScrollController();
-  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -43,7 +37,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
         print(data["data"]["recipes"]);
 
         setState(() {
-          _now = data["data"]["recipes"].length;
           _healthyFood = data["data"]["recipes"]
               .where((recipe) => recipe["category_name"] == "وصافات صحيه")
               .toList();
@@ -54,13 +47,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
           _drinks = data["data"]["recipes"]
               .where((recipe) => recipe["category_name"] == "مشروبات")
               .toList();
-          _data = data["data"]["recipes"];
-          _last = data["data"]["nums"][0]["nums"];
         });
       }
     } catch (e) {
-      //   setError(e.toString());
-      // setLoading(false);
       print(e);
     }
   }
@@ -76,7 +65,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                //هنا 
+                //هنا
                 Padding(
                   padding: const EdgeInsets.only(top: 35),
                   child: Row(
@@ -105,7 +94,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                 Icons.access_time_sharp,
                               )),
                           IconButton(
-                            onPressed: () {Scaffold.of(context).openDrawer();},
+                              onPressed: () {
+                                Scaffold.of(context).openDrawer();
+                              },
                               icon: const Icon(
                                 Icons.settings_outlined,
                               ))
@@ -114,7 +105,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     ],
                   ),
                 ),
-                //لحد هنا 
+                //لحد هنا
                 const Padding(
                     padding: EdgeInsets.only(
                         top: 30, left: 15, right: 15, bottom: 15),
@@ -141,7 +132,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                               "get/" +
                               _healthyFood[index]['recipe_photo'],
                           border_radius: 30,
-                         recipeId: _normalFood[index]['recipe_id'],
+                          recipeId: _normalFood[index]['recipe_id'],
                         );
                       },
                     ),
@@ -210,7 +201,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
                               k_host + "get/" + _drinks[index]['recipe_photo'],
                           border_radius: 30,
                           recipeId: _normalFood[index]['recipe_id'],
-                          // artistAndPodcastersItems: widget.artistAndPodcastersItems,
                         );
                       },
                     ),
@@ -221,72 +211,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     child: SizedBox(height: 140, width: double.infinity))
               ]),
         ),
-        //   bottom: 70,
-        //   left: 10,
-        //   child: Container(
-        //     decoration: BoxDecoration(
-        //         color: Colors.indigo.shade900,
-        //         borderRadius: BorderRadius.circular(10)),
-        //     width: MediaQuery.of(context).size.width - 20,
-        //     height: 60,
-        //     child: Padding(
-        //       padding: const EdgeInsets.all(8),
-        //       child: Row(
-        //         mainAxisAlignment: MainAxisAlignment.center,
-        //         crossAxisAlignment: CrossAxisAlignment.center,
-        //         children: [
-        //           ClipRRect(
-        //             borderRadius: BorderRadius.circular(5),
-        //             child: Image.asset("assets/songs/arijitSingh/images/tamasha.jpg"),
-        //           ),
-        //           const SizedBox(width: 10),
-        //           Column(
-        //             mainAxisAlignment: MainAxisAlignment.center,
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             mainAxisSize: MainAxisSize.max,
-        //             children: [
-        //               SizedBox(
-        //                   width: MediaQuery.of(context).size.width - 46 - 194,
-        //                   height: 20,
-        //                   child: Marquee(
-        //                     text: "Agar Tum Saath Ho (From Tamasha)",
-        //                     style: const TextStyle(
-        //                         fontSize: 15,
-        //                         fontFamily: "SpotifyCircularBold",
-        //                         ),
-        //                     scrollAxis: Axis.horizontal,
-        //                     crossAxisAlignment: CrossAxisAlignment.start,
-        //                     blankSpace: 70,
-        //                     velocity: 20.0,
-        //                     startPadding: 5.0,
-        //                   )),
-        //               const Text(
-        //                 "Arijit Singh",
-        //                 style: TextStyle(
-        //                     fontSize: 14,
-        //                     fontFamily: "SpotifyCircularMedium",
-        //                     ),
-        //                 textAlign: TextAlign.left,
-        //               )
-        //             ],
-        //           ),
-        //           IconButton(
-        //               onPressed: () {},
-        //               icon:
-        //                   const Icon(Icons.devices_sharp, color: Colors.grey)),
-        //           IconButton(
-        //               onPressed: () {},
-        //               icon: Icon(Icons.favorite_outlined,
-        //                   color: Colors.greenAccent[400])),
-        //           IconButton(
-        //               onPressed: () {},
-        //               icon: const Icon(Icons.play_arrow_rounded,
-        //                   ))
-        //         ],
-        //       ),
-        //     ),
-        //   ),
-        // )
       ],
     );
   }

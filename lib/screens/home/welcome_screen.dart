@@ -1,12 +1,9 @@
-//import 'dart:js_util';
 // ignore_for_file: file_names, non_constant_identifier_names, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:async';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:diabetic/screens/auth/login_screen.dart';
 import 'package:diabetic/screens/auth/signup_screen.dart';
-
 import 'package:diabetic/widgets/buttons/buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:diabetic/utils/constants.dart';
@@ -20,6 +17,7 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  // متغير ليحدد ماذا يعرض علي شاشة التطبيق
   String myView = "welcome";
 
   // Internet Connection Checker :---
@@ -34,12 +32,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     startStreaming();
   }
 
+// دالة لتغير ما يعرض
   changeMyView(view) {
     setState(() {
       myView = view;
     });
   }
 
+// التحقق من اتصال النت
   checkInternet() async {
     result = await Connectivity().checkConnectivity();
     if (result != ConnectivityResult.none) {
@@ -51,6 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() {});
   }
 
+// عمل ايفينت مستمر للتحقق من النت اثناء عمل التطبيق
   startStreaming() {
     subscription = Connectivity().onConnectivityChanged.listen((event) async {
       checkInternet();
@@ -65,22 +66,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         backgroundColor: Theme.of(context).canvasColor,
       ),
       backgroundColor: Theme.of(context).canvasColor,
+      // عرض التطبيق علي حسب حالة المتغير
       body: (myView == "login"
           ? LoginScreen(
               view: changeMyView,
             )
           : myView == "signup"
               ? SignupScreen(view: changeMyView)
-              : Column(
+              :
+              // صفحة الترحيب
+              Column(
                   children: [
-                    Expanded(child: const CircleAvatar(
-                      backgroundColor: Colors.transparent,
+                    Expanded(
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.transparent,
                         backgroundImage: AssetImage("assets/images/logo.png"),
                         radius: 110,
-                    ),),
+                      ),
+                    ),
                     Text(
                       "Welcome to Diabetic ",
-                      style: TextStyle( fontSize: 30.0),
+                      style: TextStyle(fontSize: 30.0),
                     ),
                     Container(
                       padding: EdgeInsets.all(40.0),
@@ -121,6 +127,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     )
                   ],
                 )),
+      // نهاية صفحة الترحيب
       extendBody: true,
     );
   }
