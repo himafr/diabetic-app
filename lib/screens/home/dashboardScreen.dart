@@ -30,7 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   //       ));
   // }
 
-  int currentIndex = 2;
+  int currentIndex = 1;
   bool bookColor = false;
   double bookSize = 24;
   double bookTextSize = 13;
