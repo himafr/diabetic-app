@@ -7,7 +7,6 @@ import 'package:diabetic/services/networking.dart';
 import 'package:diabetic/utils/constants.dart';
 import 'package:diabetic/utils/urls.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
