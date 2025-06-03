@@ -69,27 +69,24 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _register() async {
     setLoading(true);
-
     try {
       final prefs = await SharedPreferences.getInstance();
       final networkHelper = NetworkHelper(url: signupUrl);
-
       final response = await networkHelper.postData({
         'username': username,
         'password': password,
         'first_name': firstName,
         'date_of_birth': selectedDate.toString(),
       });
-
       if (response['status'] == 'success') {
         await prefs.setString('token', response['token']);
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => const DashboardScreen(title: 'DashboardScreen'),
-          ),
-        );
+            builder: (_) => const DashboardScreen(title: 
+            'DashboardScreen'),
+          ), );
       } else {
         setError(response['message'] ?? 'Registration failed.');
       }

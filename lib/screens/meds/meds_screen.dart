@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, file_names, avoid_print, prefer_const_constructors
+// ignore_for_file: camel_case_types, file_names, avoid_print, prefer_const_constructors, prefer_final_fields
 
 import 'dart:math';
 import 'package:diabetic/screens/meds/medicine_screen.dart';

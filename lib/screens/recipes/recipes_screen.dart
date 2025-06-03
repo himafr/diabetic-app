@@ -23,7 +23,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
     super.initState();
     loadRecipe();
   }
-
   void loadRecipe() async {
 //  setLoading(true);
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -34,8 +33,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
     try {
       dynamic data = await networkHelper.getData();
       if (data["status"] == "success") {
-        print(data["data"]["recipes"]);
-
         setState(() {
           _healthyFood = data["data"]["recipes"]
               .where((recipe) => recipe["category_name"] == "وصافات صحيه")

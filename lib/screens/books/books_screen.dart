@@ -35,7 +35,6 @@ class _BooksScreenState extends State<BooksScreen> {
       }
     });
   }
-
   void loadBooks() async {
 //  setLoading(true);
     SharedPreferences prefs = await SharedPreferences.getInstance();
